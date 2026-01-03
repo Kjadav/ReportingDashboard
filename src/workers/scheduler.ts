@@ -32,7 +32,7 @@ export async function initializeScheduler(): Promise<void> {
     }
   );
 
-  console.log('📅 Scheduler initialized');
+  console.log('Scheduler initialized');
   console.log(`   Daily sync: ${DAILY_SYNC_CRON}`);
 }
 
@@ -40,7 +40,7 @@ export async function initializeScheduler(): Promise<void> {
  * Trigger daily sync for all enabled accounts
  */
 export async function triggerDailySync(): Promise<void> {
-  console.log('🔄 Triggering daily sync for all accounts...');
+  console.log('Triggering daily sync for all accounts...');
 
   const accounts = await prisma.adAccount.findMany({
     where: {
@@ -103,7 +103,7 @@ export async function triggerDailySync(): Promise<void> {
     }
   }
 
-  console.log(`✅ Daily sync triggered for ${accounts.length} accounts`);
+  console.log(`Daily sync triggered for ${accounts.length} accounts`);
 }
 
 /**
@@ -111,7 +111,7 @@ export async function triggerDailySync(): Promise<void> {
  * This is for near real-time spend tracking
  */
 export async function triggerIntradaySync(): Promise<void> {
-  console.log('🔄 Triggering intraday sync...');
+  console.log('Triggering intraday sync...');
 
   // For now, intraday sync is the same as daily but just for today
   const accounts = await prisma.adAccount.findMany({

@@ -4,7 +4,7 @@ A production-ready, multi-tenant advertising analytics platform that syncs data 
 
 ![Medula Dashboard](https://via.placeholder.com/800x400?text=Medula+Dashboard)
 
-## 🚀 Features
+## Features
 
 - **Multi-tenant Architecture** - Organizations with role-based access control
 - **OAuth2 Integration** - Secure Google Ads connection with encrypted tokens
@@ -14,7 +14,7 @@ A production-ready, multi-tenant advertising analytics platform that syncs data 
 - **Beautiful Dashboard** - Modern React/Next.js frontend with real-time metrics
 - **Unified Metrics** - Normalized data across multiple ad platforms
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -36,13 +36,13 @@ A production-ready, multi-tenant advertising analytics platform that syncs data 
                                      └─────────────────┘
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+
 - Docker and Docker Compose
 - Google Ads API credentials (Developer Token, OAuth2 Client ID/Secret)
 
-## 🛠 Quick Start
+## Quick Start
 
 ### 1. Clone and Install
 
@@ -138,7 +138,7 @@ npm run dev:frontend
 - **pgAdmin** (debug mode): http://localhost:5050
 - **Redis Commander** (debug mode): http://localhost:8081
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Authentication
 
@@ -186,7 +186,7 @@ npm run dev:frontend
 | POST | `/api/sync/manual` | Trigger sync |
 | GET | `/api/sync/queue-stats` | Queue stats |
 
-## 🔧 Configuration
+## Configuration
 
 ### Google Ads API Setup
 
@@ -205,7 +205,7 @@ The system supports multiple sync types:
 - **Intraday Sync**: Optional hourly sync for real-time spend tracking
 - **Manual Sync**: Triggered by admin from the UI
 
-## 📊 Data Model
+## Data Model
 
 ### Core Tables
 
@@ -234,7 +234,7 @@ The system supports multiple sync types:
 | `cpm` | Cost per thousand impressions (derived) |
 | `roas` | Return on ad spend (derived) |
 
-## 🔐 Security
+## Security
 
 - Passwords hashed with Argon2
 - JWT tokens for API authentication
@@ -242,7 +242,7 @@ The system supports multiple sync types:
 - Rate limiting on all endpoints
 - Role-based access control (Admin/Viewer)
 
-## 🧪 Development
+## Development
 
 ### Database Management
 
@@ -264,7 +264,7 @@ npm run lint
 npm run typecheck
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Production Build
 
@@ -280,7 +280,7 @@ npm start
 - Use managed PostgreSQL (e.g., AWS RDS, Supabase)
 - Use managed Redis (e.g., AWS ElastiCache, Upstash)
 
-## 🗺 Roadmap
+## Roadmap
 
 - [ ] Meta Ads integration
 - [ ] TikTok Ads integration
@@ -291,15 +291,14 @@ npm start
 - [ ] Budget alerts
 - [ ] Custom dashboards
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our contributing guidelines before submitting a PR.
 
 ---
 
-Built with ❤️ using Next.js, Express, Prisma, and BullMQ
-
+Built with Next.js, Express, Prisma, and BullMQ

@@ -4,13 +4,13 @@ import { QUEUE_NAMES, SyncJobData, DimensionSyncJobData } from '../lib/queue';
 import { processSyncJob } from './sync-processor';
 import { processDimensionsJob } from './dimensions-processor';
 
-console.log('🔧 Starting Ads Analytics Workers...');
+console.log('Starting Ads Analytics Workers...');
 
 // Create sync worker
 const syncWorker = new Worker<SyncJobData>(
   QUEUE_NAMES.SYNC,
   async (job: Job<SyncJobData>) => {
-    console.log(`📊 Processing sync job: ${job.id} - ${job.data.type}`);
+    console.log(`Processing sync job: ${job.id} - ${job.data.type}`);
     return processSyncJob(job);
   },
   {
@@ -24,11 +24,11 @@ const syncWorker = new Worker<SyncJobData>(
 );
 
 syncWorker.on('completed', (job) => {
-  console.log(`✅ Sync job completed: ${job.id}`);
+  console.log(`Sync job completed: ${job.id}`);
 });
 
 syncWorker.on('failed', (job, err) => {
-  console.error(`❌ Sync job failed: ${job?.id}`, err.message);
+  console.error(`Sync job failed: ${job?.id}`, err.message);
 });
 
 syncWorker.on('error', (err) => {
@@ -39,7 +39,7 @@ syncWorker.on('error', (err) => {
 const dimensionsWorker = new Worker<DimensionSyncJobData>(
   QUEUE_NAMES.DIMENSIONS,
   async (job: Job<DimensionSyncJobData>) => {
-    console.log(`📁 Processing dimensions job: ${job.id}`);
+    console.log(`Processing dimensions job: ${job.id}`);
     return processDimensionsJob(job);
   },
   {
@@ -49,11 +49,11 @@ const dimensionsWorker = new Worker<DimensionSyncJobData>(
 );
 
 dimensionsWorker.on('completed', (job) => {
-  console.log(`✅ Dimensions job completed: ${job.id}`);
+  console.log(`Dimensions job completed: ${job.id}`);
 });
 
 dimensionsWorker.on('failed', (job, err) => {
-  console.error(`❌ Dimensions job failed: ${job?.id}`, err.message);
+  console.error(`Dimensions job failed: ${job?.id}`, err.message);
 });
 
 dimensionsWorker.on('error', (err) => {
@@ -62,7 +62,7 @@ dimensionsWorker.on('error', (err) => {
 
 // Graceful shutdown
 const shutdown = async () => {
-  console.log('🛑 Shutting down workers...');
+  console.log('Shutting down workers...');
   await Promise.all([
     syncWorker.close(),
     dimensionsWorker.close(),
@@ -74,7 +74,7 @@ const shutdown = async () => {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-console.log('✨ Workers started successfully');
+console.log('Workers started successfully');
 console.log(`   Sync worker: ${QUEUE_NAMES.SYNC}`);
 console.log(`   Dimensions worker: ${QUEUE_NAMES.DIMENSIONS}`);
 

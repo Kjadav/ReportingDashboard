@@ -67,7 +67,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 API server running on http://localhost:${PORT}`);
+  console.log(`API server running on http://localhost:${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
 });
 
