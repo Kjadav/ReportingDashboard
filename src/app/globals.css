@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 83% 58%;
+    --radius: 0.75rem;
+    --chart-1: 262 83% 58%;
+    --chart-2: 280 65% 60%;
+    --chart-3: 220 70% 50%;
+    --chart-4: 340 75% 55%;
+    --chart-5: 30 80% 55%;
+  }
+
+  .dark {
+    --background: 260 25% 4%;
+    --foreground: 0 0% 95%;
+    --card: 260 20% 7%;
+    --card-foreground: 0 0% 95%;
+    --popover: 260 20% 7%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 15% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 260 15% 12%;
+    --muted-foreground: 260 5% 55%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 260 15% 15%;
+    --input: 260 15% 15%;
+    --ring: 262 83% 58%;
+    --chart-1: 262 83% 58%;
+    --chart-2: 280 65% 60%;
+    --chart-3: 220 70% 50%;
+    --chart-4: 340 75% 55%;
+    --chart-5: 30 80% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* Smooth animations */
+.animate-in {
+  animation: animateIn 0.5s ease-out;
+}
+
+@keyframes animateIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-2 { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-3 { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-4 { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-5 { animation-delay: 0.5s; opacity: 0; animation-fill-mode: forwards; }
+
+/* Gradient text - Medula purple */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(280, 65%, 60%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass morphism */
+.glass {
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* Glow effects - Purple theme */
+.glow {
+  box-shadow: 0 0 40px hsl(262, 83%, 58%, 0.2);
+}
+
+.glow-sm {
+  box-shadow: 0 0 20px hsl(262, 83%, 58%, 0.15);
+}
+
+/* Grid pattern background */
+.bg-grid {
+  background-image: 
+    linear-gradient(hsl(var(--border) / 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.4) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Dot pattern */
+.bg-dots {
+  background-image: radial-gradient(hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Medula gradient backgrounds */
+.bg-medula-gradient {
+  background: linear-gradient(135deg, hsl(260, 25%, 4%) 0%, hsl(260, 30%, 8%) 100%);
+}
+
+.bg-medula-gradient-light {
+  background: linear-gradient(135deg, hsl(262, 83%, 58%, 0.05) 0%, hsl(280, 65%, 60%, 0.05) 100%);
+}
+
+/* Hover card effect */
+.hover-card {
+  transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px hsl(var(--foreground) / 0.1);
+}
+
+/* Selection color */
+::selection {
+  background: hsl(262, 83%, 58%, 0.3);
+}
+
+/* Purple glow for inputs on focus */
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 2px hsl(262, 83%, 58%, 0.2);
+}

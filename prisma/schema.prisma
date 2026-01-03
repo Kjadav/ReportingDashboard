@@ -1,0 +1,348 @@
+// Prisma Schema for Ads Analytics Platform
+// Multi-tenant architecture with Organizations
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION & ORGANIZATIONS
+// ============================================
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  avatarUrl     String?
+  emailVerified Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  memberships   Membership[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  memberships Membership[]
+  connections Connection[]
+  adAccounts  AdAccount[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String   @id @default(uuid())
+  userId         String
+  organizationId String
+  role           Role     @default(VIEWER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@map("memberships")
+}
+
+enum Role {
+  ADMIN
+  VIEWER
+}
+
+// ============================================
+// OAUTH CONNECTIONS
+// ============================================
+
+model Connection {
+  id                  String    @id @default(uuid())
+  organizationId      String
+  provider            Provider
+  providerAccountId   String?   // Google account ID
+  providerEmail       String?   // Email of connected account
+  accessTokenEnc      String    // Encrypted access token
+  refreshTokenEnc     String    // Encrypted refresh token
+  accessTokenExpiry   DateTime?
+  scopes              String[]
+  status              ConnectionStatus @default(ACTIVE)
+  lastRefreshedAt     DateTime?
+  errorMessage        String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  adAccounts   AdAccount[]
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+  @@map("connections")
+}
+
+enum Provider {
+  GOOGLE_ADS
+  META_ADS
+  TIKTOK_ADS
+}
+
+enum ConnectionStatus {
+  ACTIVE
+  EXPIRED
+  ERROR
+  DISCONNECTED
+}
+
+// ============================================
+// AD ACCOUNTS
+// ============================================
+
+model AdAccount {
+  id               String    @id @default(uuid())
+  organizationId   String
+  connectionId     String
+  provider         Provider
+  externalId       String    // Google Ads Customer ID
+  name             String
+  currency         String    @default("USD")
+  timezone         String    @default("America/Los_Angeles")
+  isEnabled        Boolean   @default(true)
+  lastSyncedAt     DateTime?
+  syncStatus       SyncStatus @default(PENDING)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connection   Connection   @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  campaigns    Campaign[]
+  adGroups     AdGroup[]
+  ads          Ad[]
+  metrics      MetricsFact[]
+  syncJobs     SyncJob[]
+
+  @@unique([organizationId, provider, externalId])
+  @@index([organizationId])
+  @@index([connectionId])
+  @@map("ad_accounts")
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCING
+  SYNCED
+  ERROR
+}
+
+// ============================================
+// DIMENSION TABLES (Campaigns, Ad Groups, Ads)
+// ============================================
+
+model Campaign {
+  id            String        @id @default(uuid())
+  adAccountId   String
+  externalId    String
+  name          String
+  status        CampaignStatus @default(UNKNOWN)
+  type          String?       // SEARCH, DISPLAY, VIDEO, etc.
+  budget        Decimal?      @db.Decimal(18, 2)
+  budgetType    String?       // DAILY, LIFETIME
+  startDate     DateTime?
+  endDate       DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  adAccount AdAccount   @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  adGroups  AdGroup[]
+  ads       Ad[]
+  metrics   MetricsFact[]
+
+  @@unique([adAccountId, externalId])
+  @@index([adAccountId])
+  @@map("campaigns")
+}
+
+enum CampaignStatus {
+  ENABLED
+  PAUSED
+  REMOVED
+  UNKNOWN
+}
+
+model AdGroup {
+  id          String        @id @default(uuid())
+  adAccountId String
+  campaignId  String
+  externalId  String
+  name        String
+  status      AdGroupStatus @default(UNKNOWN)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  adAccount AdAccount   @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  campaign  Campaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  ads       Ad[]
+  metrics   MetricsFact[]
+
+  @@unique([adAccountId, externalId])
+  @@index([adAccountId])
+  @@index([campaignId])
+  @@map("ad_groups")
+}
+
+enum AdGroupStatus {
+  ENABLED
+  PAUSED
+  REMOVED
+  UNKNOWN
+}
+
+model Ad {
+  id          String    @id @default(uuid())
+  adAccountId String
+  campaignId  String
+  adGroupId   String
+  externalId  String
+  name        String?
+  type        String?   // TEXT_AD, RESPONSIVE_DISPLAY_AD, etc.
+  status      AdStatus  @default(UNKNOWN)
+  headline    String?
+  description String?
+  finalUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  adAccount AdAccount   @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  campaign  Campaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  adGroup   AdGroup     @relation(fields: [adGroupId], references: [id], onDelete: Cascade)
+  metrics   MetricsFact[]
+
+  @@unique([adAccountId, externalId])
+  @@index([adAccountId])
+  @@index([campaignId])
+  @@index([adGroupId])
+  @@map("ads")
+}
+
+enum AdStatus {
+  ENABLED
+  PAUSED
+  REMOVED
+  UNKNOWN
+}
+
+// ============================================
+// FACT TABLE (Metrics)
+// ============================================
+
+model MetricsFact {
+  id              String   @id @default(uuid())
+  date            DateTime @db.Date
+  provider        Provider
+  adAccountId     String
+  campaignId      String?
+  adGroupId       String?
+  adId            String?
+  
+  // Core Metrics
+  impressions     BigInt   @default(0)
+  clicks          BigInt   @default(0)
+  spend           Decimal  @default(0) @db.Decimal(18, 6)
+  conversions     Decimal  @default(0) @db.Decimal(18, 6)
+  conversionValue Decimal  @default(0) @db.Decimal(18, 6)
+  
+  // Additional Metrics
+  costPerClick    Decimal? @db.Decimal(18, 6)
+  ctr             Decimal? @db.Decimal(18, 6)
+  cpm             Decimal? @db.Decimal(18, 6)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  adAccount AdAccount @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+  campaign  Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  adGroup   AdGroup?  @relation(fields: [adGroupId], references: [id], onDelete: Cascade)
+  ad        Ad?       @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint for upserts
+  @@unique([date, provider, adAccountId, campaignId, adGroupId, adId])
+  
+  // Indexes for common query patterns
+  @@index([date])
+  @@index([adAccountId, date])
+  @@index([campaignId, date])
+  @@index([provider, date])
+  @@map("metrics_fact")
+}
+
+// ============================================
+// SYNC JOBS
+// ============================================
+
+model SyncJob {
+  id            String      @id @default(uuid())
+  adAccountId   String
+  jobType       JobType
+  status        JobStatus   @default(PENDING)
+  dateFrom      DateTime    @db.Date
+  dateTo        DateTime    @db.Date
+  startedAt     DateTime?
+  completedAt   DateTime?
+  errorMessage  String?
+  metrics       Json?       // Job stats: rows synced, etc.
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  adAccount AdAccount @relation(fields: [adAccountId], references: [id], onDelete: Cascade)
+
+  @@index([adAccountId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("sync_jobs")
+}
+
+enum JobType {
+  INITIAL_SYNC
+  DAILY_SYNC
+  INTRADAY_SYNC
+  BACKFILL
+  MANUAL_SYNC
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
